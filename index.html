@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Barrington's Theorem and Sequence Models</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d1014;
+    --panel: #12161c;
+    --ink: #e6e9ee;
+    --muted: #8a93a1;
+    --line: #232a33;
+    --accent: #5eead4;
+    --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font-family: "IBM Plex Sans", system-ui, sans-serif; font-size: 16px; line-height: 1.6;
+  }
+  .layout { display: grid; grid-template-columns: 280px 1fr; min-height: 100vh; }
+  aside {
+    position: sticky; top: 0; height: 100vh; overflow-y: auto;
+    background: var(--panel); border-right: 1px solid var(--line); padding: 32px 24px;
+  }
+  .brand { font-family: var(--mono); font-size: 13px; color: var(--accent); margin-bottom: 28px; }
+  nav h4 { font-family: var(--mono); font-size: 11px; font-weight: 500; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin: 24px 0 8px; }
+  nav a { display: block; color: var(--muted); text-decoration: none; font-size: 14px; padding: 4px 0 4px 12px; border-left: 1px solid var(--line); }
+  nav a:hover { color: var(--ink); border-left-color: var(--accent); }
+  main { padding: 72px 56px 96px; max-width: 820px; }
+  .eyebrow { font-family: var(--mono); font-size: 13px; color: var(--muted); }
+  h1 { font-size: clamp(28px, 4.4vw, 42px); line-height: 1.15; font-weight: 600; letter-spacing: -.015em; margin: 10px 0 20px; }
+  .chain { font-family: var(--mono); font-size: 15px; color: var(--accent); padding: 12px 16px; border: 1px solid var(--line); border-radius: 8px; display: inline-block; background: var(--panel); }
+  .lecture { margin-top: 72px; }
+  .lecture-head { font-family: var(--mono); font-size: 13px; color: var(--accent); }
+  h2 { font-size: 24px; line-height: 1.3; font-weight: 600; margin: 6px 0 24px; }
+  .entry {
+    display: grid; grid-template-columns: 56px 1fr auto; align-items: baseline;
+    padding: 14px 0; border-top: 1px solid var(--line);
+  }
+  .entry:last-child { border-bottom: 1px solid var(--line); }
+  .entry .n { font-family: var(--mono); font-size: 13px; color: var(--muted); }
+  .entry h3 { margin: 0; font-size: 17px; font-weight: 500; }
+  .entry .m { font-family: var(--mono); font-size: 12px; color: var(--muted); }
+  .entry:hover h3 { color: var(--accent); }
+  footer { margin-top: 72px; font-family: var(--mono); font-size: 12px; color: var(--muted); }
+  @media (max-width: 820px) {
+    .layout { grid-template-columns: 1fr; }
+    aside { position: static; height: auto; border-right: 0; border-bottom: 1px solid var(--line); padding: 20px 16px; }
+    nav { display: none; }
+    .brand { margin: 0; }
+    main { padding: 40px 16px 72px; }
+    .entry { grid-template-columns: 44px 1fr auto; }
+  }
+</style>
+</head>
+<body>
+<div class="layout">
+  <aside>
+    <div class="brand">15-455 / project</div>
+    <nav>
+      <h4>Lecture 1</h4>
+      <a href="#s1-1">Setup</a>
+      <a href="#s1-2">Permutation branching programs</a>
+      <a href="#s1-3">Barrington's theorem</a>
+      <a href="#s1-4">Transformers ⊆ TC⁰</a>
+      <a href="#s1-5">Chain of thought escapes</a>
+      <a href="#s1-6">Cliffhanger</a>
+      <h4>Lecture 2</h4>
+      <a href="#s2-1">Recurrent models are streaming algorithms</a>
+      <a href="#s2-2">The INDEX lower bound</a>
+      <a href="#s2-3">Recall and copying need Ω(n) state</a>
+      <a href="#s2-4">State tracking in linear RNNs</a>
+      <a href="#s2-5">DeltaNet</a>
+    </nav>
+  </aside>
+
+  <main>
+    <div class="eyebrow">// course project</div>
+    <h1>Barrington's Theorem and the Expressive Limits of Sequence Models</h1>
+    <div class="chain">AC⁰ ⊆ ACC⁰ ⊆ TC⁰ ⊆ NC¹</div>
+
+    <section class="lecture" id="lecture-1">
+      <div class="lecture-head">LECTURE 01</div>
+      <h2>Barrington's theorem and the TC⁰ ceiling for transformers</h2>
+      <div class="entry" id="s1-1"><span class="n">1.1</span><h3>Setup</h3><span class="m">10m</span></div>
+      <div class="entry" id="s1-2"><span class="n">1.2</span><h3>Permutation branching programs</h3><span class="m">10m</span></div>
+      <div class="entry" id="s1-3"><span class="n">1.3</span><h3>Barrington's theorem</h3><span class="m">30m</span></div>
+      <div class="entry" id="s1-4"><span class="n">1.4</span><h3>Transformers ⊆ TC⁰</h3><span class="m">15m</span></div>
+      <div class="entry" id="s1-5"><span class="n">1.5</span><h3>Chain of thought escapes</h3><span class="m">10m</span></div>
+      <div class="entry" id="s1-6"><span class="n">1.6</span><h3>Cliffhanger</h3><span class="m">5m</span></div>
+    </section>
+
+    <section class="lecture" id="lecture-2">
+      <div class="lecture-head">LECTURE 02</div>
+      <h2>Fixed-state models: what they can't recall, and what they can track</h2>
+      <div class="entry" id="s2-1"><span class="n">2.1</span><h3>Recurrent models are streaming algorithms</h3><span class="m">10m</span></div>
+      <div class="entry" id="s2-2"><span class="n">2.2</span><h3>The INDEX lower bound</h3><span class="m">15m</span></div>
+      <div class="entry" id="s2-3"><span class="n">2.3</span><h3>Recall and copying need Ω(n) state</h3><span class="m">10m</span></div>
+      <div class="entry" id="s2-4"><span class="n">2.4</span><h3>State tracking in linear RNNs</h3><span class="m">20m</span></div>
+      <div class="entry" id="s2-5"><span class="n">2.5</span><h3>DeltaNet</h3><span class="m">20m</span></div>
+    </section>
+
+    <footer>work in progress</footer>
+  </main>
+</div>
+</body>
+</html>
