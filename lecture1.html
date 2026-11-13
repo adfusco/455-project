@@ -23,76 +23,70 @@
       <a href="#s1-1">Setup</a>
       <a href="#s1-2">Permutation branching programs</a>
       <a href="#s1-3">Barrington's theorem</a>
-      <a class="later" href="#s1-4">Transformers ⊆ TC⁰</a>
-      <a class="later" href="#s1-5">Chain of thought escapes</a>
-      <a class="later" href="#s1-6">Cliffhanger</a>
+      <a href="#s1-4">Wrap-up</a>
       <h4>Lecture 2</h4>
-      <a class="later" href="index.html#lecture-2">Fixed-state models</a>
+      <a href="lecture2.html#s2-1">Register programs</a>
+      <a href="lecture2.html#s2-2">Catalytic space</a>
+      <a href="lecture2.html#s2-3">Tree Evaluation</a>
+      <a href="lecture2.html#s2-4">Cook–Mertz</a>
+      <a href="lecture2.html#s2-5">Payoff: Williams (2025)</a>
     </nav>
   </aside>
 
   <main class="notes">
     <div class="eyebrow">// lecture 01</div>
-    <h1>Barrington's Theorem and the TC⁰ Ceiling for Transformers</h1>
+    <h1>Barrington's Theorem</h1>
 
     <div class="draft-banner">Draft. Dashed blocks are placeholders: replace each with your own text and remove its data-draft attribute.</div>
 
     <!-- ================================================================ -->
     <h2 id="s1-1"><span class="secnum">1.1</span>Setup</h2>
-    <!-- outline: AC⁰ ⊆ ACC⁰ ⊆ TC⁰ ⊆ NC¹. Parity ∉ AC⁰ (stated, not proved).
-         Majority puts you in TC⁰. TC⁰ vs. NC¹ is the open separation everything below hinges on. -->
+    <!-- outline: Circuit classes AC⁰ ⊆ TC⁰ ⊆ NC¹. Barrington refuted the conjecture
+         that constant-width programs can't compute majority. -->
 
     <div class="gram" data-draft></div>
 
     <div class="definition" data-title="Boolean circuit" id="def-circuit" data-draft></div>
 
-    <div class="definition" data-title="$\NC^1$" id="def-nc1" data-draft></div>
-
     <div class="definition" data-title="$\AC^0$" id="def-ac0" data-draft></div>
-
-    <div class="definition" data-title="$\ACC^0$" id="def-acc0" data-draft></div>
 
     <div class="definition" data-title="$\TC^0$" id="def-tc0" data-draft></div>
 
-    <div class="proposition" data-title="The chain" id="prop-chain" data-draft></div>
+    <div class="definition" data-title="$\NC^1$" id="def-nc1" data-draft></div>
+
+    <div class="proposition" data-title="$\AC^0 \subseteq \TC^0 \subseteq \NC^1$" id="prop-chain" data-draft></div>
     <div class="proof" data-draft></div>
 
     <figure>
-      <svg viewBox="0 0 640 330" width="100%" role="img" aria-label="Nested circuit classes AC0 inside ACC0 inside TC0 inside NC1, with example problems" font-family="IBM Plex Sans, sans-serif">
-        <rect x="4" y="4" width="632" height="322" rx="18" fill="#fbfbfc" stroke="#9ca3af" stroke-width="1.5" stroke-dasharray="7 5"/>
-        <rect x="24" y="44" width="472" height="270" rx="16" fill="#f6f7f9" stroke="#9ca3af" stroke-width="1.5" stroke-dasharray="7 5"/>
-        <rect x="44" y="84" width="312" height="218" rx="14" fill="#eef1f4" stroke="#9ca3af" stroke-width="1.5" stroke-dasharray="7 5"/>
-        <rect x="64" y="124" width="160" height="166" rx="12" fill="#e3e8ee" stroke="#6b7280" stroke-width="1.5"/>
+      <svg viewBox="0 0 640 300" width="100%" role="img" aria-label="Nested circuit classes AC0 inside TC0 inside NC1, with example problems" font-family="IBM Plex Sans, sans-serif">
+        <rect x="4" y="4" width="632" height="292" rx="18" fill="#fbfbfc" stroke="#9ca3af" stroke-width="1.5" stroke-dasharray="7 5"/>
+        <rect x="24" y="44" width="440" height="240" rx="16" fill="#f3f5f7" stroke="#9ca3af" stroke-width="1.5" stroke-dasharray="7 5"/>
+        <rect x="44" y="84" width="180" height="188" rx="14" fill="#e3e8ee" stroke="#6b7280" stroke-width="1.5"/>
         <g font-family="IBM Plex Mono, monospace" font-size="15" font-weight="600" fill="#b00201">
-          <text x="20" y="32">NC¹</text><text x="40" y="72">TC⁰</text><text x="60" y="112">ACC⁰</text><text x="80" y="152">AC⁰</text>
+          <text x="20" y="32">NC¹</text><text x="40" y="72">TC⁰</text><text x="60" y="112">AC⁰</text>
         </g>
         <g font-size="13" fill="#1a1d23">
-          <text x="80" y="184">AND, OR</text>
-          <text x="80" y="206">adding two n-bit</text><text x="80" y="222">numbers</text>
-          <text x="240" y="152">PARITY</text>
-          <text x="240" y="174">MODₘ</text>
-          <text x="240" y="204">word problem of</text><text x="240" y="220">solvable groups</text><text x="240" y="236">(e.g. S₄)</text>
-          <text x="374" y="112">MAJORITY</text>
-          <text x="374" y="134">iterated addition</text>
-          <text x="374" y="156">multiplication</text>
-          <text x="514" y="72">S₅ word problem</text>
-          <text x="514" y="94">formula evaluation</text>
-          <text x="514" y="116" fill="#6b7280" font-size="11.5">(both NC¹-complete)</text>
+          <text x="60" y="150">AND, OR</text>
+          <text x="60" y="174">adding two n-bit</text><text x="60" y="190">numbers</text>
+          <text x="244" y="112">PARITY</text>
+          <text x="244" y="134">MAJORITY</text>
+          <text x="244" y="156">iterated addition</text>
+          <text x="244" y="178">multiplication</text>
+          <text x="244" y="208">word problem of</text><text x="244" y="224">solvable groups</text>
+          <text x="482" y="72">S₅ word problem</text>
+          <text x="482" y="94">formula evaluation</text>
+          <text x="482" y="116" fill="#6b7280" font-size="11.5">(both NC¹-complete)</text>
         </g>
       </svg>
-      <figcaption>Each problem sits in the smallest class known to contain it. Solid boundary: known to be strict. Dashed: open.</figcaption>
+      <figcaption>Each problem sits in the smallest class shown that is known to contain it. Solid boundary: known to be strict. Dashed: open.</figcaption>
     </figure>
 
-    <div class="theorem" data-title="Parity is not in $\AC^0$" id="thm-parity" data-draft></div>
-
-    <div class="example" data-title="Majority" id="ex-majority" data-draft></div>
-
-    <div class="important" data-title="$\TC^0$ vs. $\NC^1$" data-draft></div>
+    <div class="remark" data-title="The conjecture Barrington refuted" id="rem-conjecture" data-draft></div>
 
     <!-- ================================================================ -->
     <h2 id="s1-2"><span class="secnum">1.2</span>Permutation branching programs</h2>
-    <!-- outline: Width-w programs read input bits and multiply permutations.
-         Warm-up: parity with width 2 (S₂). -->
+    <!-- outline: Width-w programs that read input bits and multiply permutations.
+         Warm-up: parity with width 2. -->
 
     <div class="gram" data-draft></div>
 
@@ -104,26 +98,20 @@
 
     <div class="demo" data-demo="stepper" id="stepper" data-preset="parity"></div>
 
-    <div class="exercise" data-title="$\MOD_3$ with width 3" id="ex-mod3" data-draft></div>
-    <div class="solution" data-draft></div>
-
-    <div class="guidingquestion" data-draft></div>
-
     <!-- ================================================================ -->
     <h2 id="s1-3"><span class="secnum">1.3</span>Barrington's theorem</h2>
-    <!-- outline: Definition: a program σ-computes f if it outputs a 5-cycle σ when f = 1 and the identity when f = 0.
-         Lemma: conjugate to switch which 5-cycle you use. NOT: append σ⁻¹, then relabel.
-         AND: commutator στσ⁻¹τ⁻¹; 5-cycle if both are 1, identity otherwise. Exhibit concrete σ, τ.
-         Length quadruples per gate → depth-O(log n) formula gives polynomial-length program.
-         Converse: evaluate a poly-length width-5 program by divide-and-conquer products in NC¹.
-         Corollary: S₅ word problem is NC¹-complete.
-         Aside: solvable groups (S₄ and below) can't do this; their word problems sit in ACC⁰. -->
+    <!-- outline: σ-computing: output a 5-cycle when f = 1, the identity when f = 0.
+         Conjugation as relabeling, which lets you use any 5-cycle you want.
+         NOT: append σ⁻¹.
+         AND: commutator of the two programs, with one concrete good pair (σ, τ) checked by hand.
+         Length grows 4× per level of the formula, so NC¹ formulas give polynomial-length width-5 programs.
+         Converse: such programs can be evaluated in NC¹. -->
 
     <div class="gram" data-draft></div>
 
     <div class="definition" data-title="$\sigma$-computing" id="def-sigma-computes" data-draft></div>
 
-    <div class="lemma" data-title="Changing the cycle" id="lem-conj" data-draft></div>
+    <div class="lemma" data-title="Conjugation as relabeling" id="lem-conj" data-draft></div>
     <div class="proof" data-draft></div>
 
     <div class="lemma" data-title="NOT" id="lem-not" data-draft></div>
@@ -131,6 +119,8 @@
 
     <div class="lemma" data-title="AND" id="lem-and" data-draft></div>
     <div class="proof" data-draft></div>
+
+    <div class="example" data-title="A good pair $(\sigma, \tau)$" id="ex-pair" data-draft></div>
 
     <div class="demo" data-demo="commutator" id="commutator"></div>
 
@@ -142,22 +132,21 @@
     <div class="theorem" data-title="Converse" id="thm-converse" data-draft></div>
     <div class="proof" data-draft></div>
 
+    <!-- ================================================================ -->
+    <h2 id="s1-4"><span class="secnum">1.4</span>Wrap-up</h2>
+    <!-- outline: Five states of memory are enough for all of NC¹. The S₅ word problem is NC¹-complete.
+         One remark: solvable groups don't work. -->
+
+    <div class="gram" data-draft></div>
+
+    <div class="corollary" data-title="$\NC^1$ = width-5 programs" id="cor-width5" data-draft></div>
+
     <div class="corollary" data-title="$S_5$ word problem" id="cor-s5" data-draft></div>
     <div class="proof" data-draft></div>
 
-    <div class="remark" data-title="Solvable groups" id="rem-solvable" data-draft></div>
+    <div class="remark" data-title="Solvable groups don't work" id="rem-solvable" data-draft></div>
 
-    <!-- ================================================================ -->
-    <h2 id="s1-4"><span class="secnum">1.4</span>Transformers ⊆ TC⁰</h2>
-    <div class="gram" data-draft></div>
-
-    <h2 id="s1-5"><span class="secnum">1.5</span>Chain of thought escapes</h2>
-    <div class="gram" data-draft></div>
-
-    <h2 id="s1-6"><span class="secnum">1.6</span>Cliffhanger</h2>
-    <div class="gram" data-draft></div>
-
-    <footer>work in progress</footer>
+    <footer>work in progress · <a href="lecture2.html">Lecture 2 →</a></footer>
   </main>
 </div>
 </body>

@@ -1,6 +1,6 @@
 # Writing blocks on the site
 
-Every block is a `<div>` with a class. Numbering, labels, collapsing and math rendering happen automatically (`assets/notes.js`). Math: `$...$` inline, `$$...$$` display. Macros: `\AC \ACC \TC \NC \P \NP \L \N \st \enc{} \MAJ \MOD \PARITY \AND \OR \NOT \poly`.
+Every block is a `<div>` with a class. Numbering, labels, collapsing and math rendering happen automatically (`assets/notes.js`). Math: `$...$` inline, `$$...$$` display. Macros: `\AC \ACC \TC \NC \P \NP \L \NL \CL \TIME \SPACE \TreeEval \N \st \enc{} \MAJ \MOD \PARITY \AND \OR \NOT \poly`.
 
 | LaTeX (`panda_notes_style.sty`) | HTML |
 |---|---|

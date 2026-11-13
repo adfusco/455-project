@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Barrington's Theorem and Sequence Models</title>
+<title>Barrington and Catalytic Space</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
@@ -66,45 +66,41 @@
     <div class="brand">15-455 / project</div>
     <nav>
       <h4>Lecture 1</h4>
-      <a href="#s1-1">Setup</a>
-      <a href="#s1-2">Permutation branching programs</a>
-      <a href="#s1-3">Barrington's theorem</a>
-      <a href="#s1-4">Transformers ⊆ TC⁰</a>
-      <a href="#s1-5">Chain of thought escapes</a>
-      <a href="#s1-6">Cliffhanger</a>
+      <a href="lecture1.html#s1-1">Setup</a>
+      <a href="lecture1.html#s1-2">Permutation branching programs</a>
+      <a href="lecture1.html#s1-3">Barrington's theorem</a>
+      <a href="lecture1.html#s1-4">Wrap-up</a>
       <h4>Lecture 2</h4>
-      <a href="#s2-1">Recurrent models are streaming algorithms</a>
-      <a href="#s2-2">The INDEX lower bound</a>
-      <a href="#s2-3">Recall and copying need Ω(n) state</a>
-      <a href="#s2-4">State tracking in linear RNNs</a>
-      <a href="#s2-5">DeltaNet</a>
+      <a href="lecture2.html#s2-1">Register programs</a>
+      <a href="lecture2.html#s2-2">Catalytic space</a>
+      <a href="lecture2.html#s2-3">Tree Evaluation</a>
+      <a href="lecture2.html#s2-4">Cook–Mertz</a>
+      <a href="lecture2.html#s2-5">Payoff: Williams (2025)</a>
     </nav>
   </aside>
 
   <main>
     <div class="eyebrow">// course project</div>
-    <h1>Barrington's Theorem and the Expressive Limits of Sequence Models</h1>
-    <div class="chain">AC⁰ ⊆ ACC⁰ ⊆ TC⁰ ⊆ NC¹</div>
+    <h1>Barrington's Theorem and Computing with a Full Memory</h1>
+    <div class="chain">AC⁰ ⊆ TC⁰ ⊆ NC¹ ⊆ L ⊆ CL</div>
 
     <section class="lecture" id="lecture-1">
       <div class="lecture-head">LECTURE 01</div>
-      <h2>Barrington's theorem and the TC⁰ ceiling for transformers</h2>
-      <div class="entry" id="s1-1"><span class="n">1.1</span><h3><a href="lecture1.html#s1-1">Setup</a></h3><span class="m">10m</span></div>
-      <div class="entry" id="s1-2"><span class="n">1.2</span><h3><a href="lecture1.html#s1-2">Permutation branching programs</a></h3><span class="m">10m</span></div>
-      <div class="entry" id="s1-3"><span class="n">1.3</span><h3><a href="lecture1.html#s1-3">Barrington's theorem</a></h3><span class="m">30m</span></div>
-      <div class="entry" id="s1-4"><span class="n">1.4</span><h3><a href="lecture1.html#s1-4">Transformers ⊆ TC⁰</a></h3><span class="m">15m</span></div>
-      <div class="entry" id="s1-5"><span class="n">1.5</span><h3><a href="lecture1.html#s1-5">Chain of thought escapes</a></h3><span class="m">10m</span></div>
-      <div class="entry" id="s1-6"><span class="n">1.6</span><h3><a href="lecture1.html#s1-6">Cliffhanger</a></h3><span class="m">5m</span></div>
+      <h2>Barrington's theorem</h2>
+      <div class="entry"><span class="n">1.1</span><h3><a href="lecture1.html#s1-1">Setup</a></h3></div>
+      <div class="entry"><span class="n">1.2</span><h3><a href="lecture1.html#s1-2">Permutation branching programs</a></h3></div>
+      <div class="entry"><span class="n">1.3</span><h3><a href="lecture1.html#s1-3">Barrington's theorem</a></h3></div>
+      <div class="entry"><span class="n">1.4</span><h3><a href="lecture1.html#s1-4">Wrap-up</a></h3></div>
     </section>
 
     <section class="lecture" id="lecture-2">
       <div class="lecture-head">LECTURE 02</div>
-      <h2>Fixed-state models: what they can't recall, and what they can track</h2>
-      <div class="entry" id="s2-1"><span class="n">2.1</span><h3>Recurrent models are streaming algorithms</h3><span class="m">10m</span></div>
-      <div class="entry" id="s2-2"><span class="n">2.2</span><h3>The INDEX lower bound</h3><span class="m">15m</span></div>
-      <div class="entry" id="s2-3"><span class="n">2.3</span><h3>Recall and copying need Ω(n) state</h3><span class="m">10m</span></div>
-      <div class="entry" id="s2-4"><span class="n">2.4</span><h3>State tracking in linear RNNs</h3><span class="m">20m</span></div>
-      <div class="entry" id="s2-5"><span class="n">2.5</span><h3>DeltaNet</h3><span class="m">20m</span></div>
+      <h2>Computing with a full memory</h2>
+      <div class="entry"><span class="n">2.1</span><h3><a href="lecture2.html#s2-1">Register programs</a></h3></div>
+      <div class="entry"><span class="n">2.2</span><h3><a href="lecture2.html#s2-2">Catalytic space</a></h3></div>
+      <div class="entry"><span class="n">2.3</span><h3><a href="lecture2.html#s2-3">Tree Evaluation</a></h3></div>
+      <div class="entry"><span class="n">2.4</span><h3><a href="lecture2.html#s2-4">Cook–Mertz</a></h3></div>
+      <div class="entry"><span class="n">2.5</span><h3><a href="lecture2.html#s2-5">Payoff: Williams (2025)</a></h3></div>
     </section>
 
     <footer>work in progress</footer>

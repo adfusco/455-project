@@ -16,7 +16,8 @@
 
   const MACROS = {
     "\\AC": "\\mathsf{AC}", "\\ACC": "\\mathsf{ACC}", "\\TC": "\\mathsf{TC}", "\\NC": "\\mathsf{NC}",
-    "\\P": "\\mathsf{P}", "\\NP": "\\mathsf{NP}", "\\L": "\\mathsf{L}", "\\NEXP": "\\mathsf{NEXP}",
+    "\\P": "\\mathsf{P}", "\\NP": "\\mathsf{NP}", "\\L": "\\mathsf{L}", "\\NL": "\\mathsf{NL}", "\\NEXP": "\\mathsf{NEXP}",
+    "\\CL": "\\mathsf{CL}", "\\TIME": "\\mathsf{TIME}", "\\SPACE": "\\mathsf{SPACE}", "\\TreeEval": "\\mathrm{TreeEval}",
     "\\N": "\\mathbb{N}", "\\Z": "\\mathbb{Z}", "\\R": "\\mathbb{R}",
     "\\st": "\\mid", "\\enc": "\\langle #1 \\rangle", "\\poly": "\\mathrm{poly}",
     "\\MAJ": "\\mathrm{MAJ}", "\\MOD": "\\mathrm{MOD}", "\\PARITY": "\\mathrm{PARITY}",
@@ -63,7 +64,7 @@
       for (const a of el.attributes) if (a.name.startsWith("data-")) det.setAttribute(a.name, a.value);
       if (el.hasAttribute("data-open")) det.open = true;
       const title = el.getAttribute("data-title");
-      det.innerHTML = `<summary>${COLLAPSIBLE[kind]}${title ? ` <span class="env-note">(${title})</span>` : ""}. <span class="hint">click to expand</span></summary>`;
+      det.innerHTML = `<summary><span>${COLLAPSIBLE[kind]}${title ? ` <span class="env-note">(${title})</span>` : ""}.</span> <span class="hint">click to expand</span></summary>`;
       det.appendChild(wrapBody(el));
       el.replaceWith(det);
     });

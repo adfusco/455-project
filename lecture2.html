@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lecture 2 · Computing with a Full Memory</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<link rel="stylesheet" href="assets/notes.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+<script defer src="assets/notes.js"></script>
+</head>
+<body>
+<div class="layout">
+  <aside>
+    <div class="brand"><a href="index.html">15-455 / project</a></div>
+    <nav>
+      <h4>Lecture 1</h4>
+      <a href="lecture1.html#s1-1">Setup</a>
+      <a href="lecture1.html#s1-2">Permutation branching programs</a>
+      <a href="lecture1.html#s1-3">Barrington's theorem</a>
+      <a href="lecture1.html#s1-4">Wrap-up</a>
+      <h4>Lecture 2</h4>
+      <a href="#s2-1">Register programs</a>
+      <a href="#s2-2">Catalytic space</a>
+      <a href="#s2-3">Tree Evaluation</a>
+      <a href="#s2-4">Cook–Mertz</a>
+      <a href="#s2-5">Payoff: Williams (2025)</a>
+    </nav>
+  </aside>
+
+  <main class="notes">
+    <div class="eyebrow">// lecture 02</div>
+    <h1>Computing with a Full Memory</h1>
+
+    <div class="draft-banner">Draft. Dashed blocks are placeholders: replace each with your own text and remove its data-draft attribute.</div>
+
+    <!-- ================================================================ -->
+    <h2 id="s2-1"><span class="secnum">2.1</span>Register programs</h2>
+    <!-- outline: Ben-Or–Cleve. Barrington over rings: three registers, and the commutator becomes
+         "do, do, undo, undo." Programs add f(x) into a register and restore every other register. -->
+
+    <div class="gram" data-draft></div>
+
+    <div class="definition" data-title="Register program" id="def-regprog" data-draft></div>
+
+    <div class="definition" data-title="Cleanly computing $f$" id="def-clean" data-draft></div>
+
+    <div class="lemma" data-title="Do, do, undo, undo" id="lem-ddu" data-draft></div>
+    <div class="proof" data-draft></div>
+
+    <div class="theorem" data-title="Ben-Or–Cleve" id="thm-boc" data-draft></div>
+    <div class="proof" data-draft></div>
+
+    <!-- ================================================================ -->
+    <h2 id="s2-2"><span class="secnum">2.2</span>Catalytic space</h2>
+    <!-- outline: Model: O(log n) clean space, plus a full disk that must be returned exactly as found.
+         Warm-up: NC¹ ⊆ CL.
+         Stated: TC¹ ⊆ CL, so NL ⊆ CL. Directed reachability becomes solvable in log space with a borrowed disk. -->
+
+    <div class="gram" data-draft></div>
+
+    <div class="definition" data-title="Catalytic log-space $\CL$" id="def-cl" data-draft></div>
+
+    <div class="proposition" data-title="$\NC^1 \subseteq \CL$" id="prop-nc1-cl" data-draft></div>
+    <div class="proof" data-draft></div>
+
+    <div class="theorem" data-title="$\TC^1 \subseteq \CL$" id="thm-tc1-cl" data-draft></div>
+
+    <div class="corollary" data-title="$\NL \subseteq \CL$" id="cor-nl-cl" data-draft></div>
+
+    <!-- ================================================================ -->
+    <h2 id="s2-3"><span class="secnum">2.3</span>Tree Evaluation</h2>
+    <!-- outline: The problem, the obvious O(h·ℓ) = O(log² n) depth-first algorithm,
+         and why it was an L vs. P candidate. -->
+
+    <div class="gram" data-draft></div>
+
+    <div class="definition" data-title="$\TreeEval$" id="def-treeeval" data-draft></div>
+
+    <div class="proposition" data-title="Depth-first evaluation" id="prop-dfs" data-draft></div>
+    <div class="proof" data-draft></div>
+
+    <div class="guidingquestion" data-draft></div>
+
+    <!-- ================================================================ -->
+    <h2 id="s2-4"><span class="secnum">2.4</span>Cook–Mertz</h2>
+    <!-- outline: Write each node's function as a low-degree polynomial mod p.
+         Recover a value from noisy register contents by interpolation.
+         The recursion stores only a loop counter per level, giving O(log n · log log n) space. -->
+
+    <div class="theorem" data-title="Cook–Mertz" id="thm-cm" data-draft></div>
+
+    <div class="gram" data-draft></div>
+
+    <div class="lemma" data-title="Low-degree representation" id="lem-lowdeg" data-draft></div>
+    <div class="proof" data-draft></div>
+
+    <div class="lemma" data-title="Recovery by interpolation" id="lem-interp" data-draft></div>
+    <div class="proof" data-draft></div>
+
+    <div class="proof" data-title="of Cook–Mertz" data-draft></div>
+
+    <!-- ================================================================ -->
+    <h2 id="s2-5"><span class="secnum">2.5</span>Payoff: Williams (2025)</h2>
+    <!-- outline: Reduce time-t computation to Tree Evaluation, giving TIME[t] ⊆ SPACE[√(t log t)]. -->
+
+    <div class="theorem" data-title="Williams 2025" id="thm-williams" data-draft></div>
+    <div class="proof" data-title="sketch" data-draft></div>
+
+    <footer><a href="lecture1.html">← Lecture 1</a> · work in progress</footer>
+  </main>
+</div>
+</body>
+</html>
