@@ -17,7 +17,8 @@
   const MACROS = {
     "\\AC": "\\mathsf{AC}", "\\ACC": "\\mathsf{ACC}", "\\TC": "\\mathsf{TC}", "\\NC": "\\mathsf{NC}",
     "\\P": "\\mathsf{P}", "\\NP": "\\mathsf{NP}", "\\L": "\\mathsf{L}", "\\NL": "\\mathsf{NL}", "\\NEXP": "\\mathsf{NEXP}",
-    "\\CL": "\\mathsf{CL}", "\\TIME": "\\mathsf{TIME}", "\\SPACE": "\\mathsf{SPACE}", "\\TreeEval": "\\mathrm{TreeEval}",
+    "\\CL": "\\mathsf{CL}", "\\CSPACE": "\\mathsf{CSPACE}", "\\PSPACE": "\\mathsf{PSPACE}", "\\ZPP": "\\mathsf{ZPP}",
+    "\\pluseq": "\\mathrel{+}=", "\\minuseq": "\\mathrel{-}=", "\\TIME": "\\mathsf{TIME}", "\\SPACE": "\\mathsf{SPACE}", "\\TreeEval": "\\mathrm{TreeEval}",
     "\\N": "\\mathbb{N}", "\\Z": "\\mathbb{Z}", "\\R": "\\mathbb{R}",
     "\\st": "\\mid", "\\enc": "\\langle #1 \\rangle", "\\poly": "\\mathrm{poly}",
     "\\MAJ": "\\mathrm{MAJ}", "\\MOD": "\\mathrm{MOD}", "\\PARITY": "\\mathrm{PARITY}",
@@ -94,6 +95,46 @@
     });
   }
 
+  // Hovering (or focusing) a same-page cross-reference shows a copy of its target,
+  // so readers can check a definition without scrolling away.
+  function refPreviews() {
+    if (!window.matchMedia("(hover: hover)").matches) return;
+    const tip = document.createElement("div");
+    tip.className = "ref-preview notes";
+    tip.hidden = true;
+    document.body.appendChild(tip);
+    let hideTimer;
+    const hide = () => { hideTimer = setTimeout(() => (tip.hidden = true), 120); };
+    tip.addEventListener("mouseenter", () => clearTimeout(hideTimer));
+    tip.addEventListener("mouseleave", hide);
+
+    document.querySelectorAll(".notes a.ref").forEach((a) => {
+      const href = a.getAttribute("href") || "";
+      if (!href.startsWith("#")) return;
+      const target = document.querySelector(href);
+      if (!target) return;
+      const show = () => {
+        clearTimeout(hideTimer);
+        const copy = target.cloneNode(true);
+        copy.removeAttribute("id");
+        copy.querySelectorAll("[id]").forEach((n) => n.removeAttribute("id"));
+        copy.querySelectorAll(".demo").forEach((n) => n.remove());
+        tip.replaceChildren(copy);
+        tip.hidden = false;
+        const r = a.getBoundingClientRect();
+        const w = tip.offsetWidth, h = tip.offsetHeight;
+        const left = Math.max(8, Math.min(r.left, window.innerWidth - w - 8));
+        const below = r.bottom + 8 + h < window.innerHeight;
+        tip.style.left = left + window.scrollX + "px";
+        tip.style.top = (below ? r.bottom + 8 : r.top - h - 8) + window.scrollY + "px";
+      };
+      a.addEventListener("mouseenter", show);
+      a.addEventListener("focus", show);
+      a.addEventListener("mouseleave", hide);
+      a.addEventListener("blur", hide);
+    });
+  }
+
   window.NotesMacros = MACROS;
-  document.addEventListener("DOMContentLoaded", () => { build(); renderMath(); });
+  document.addEventListener("DOMContentLoaded", () => { build(); renderMath(); refPreviews(); });
 })();

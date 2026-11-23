@@ -12,6 +12,8 @@
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
 <script defer src="assets/notes.js"></script>
+<script defer src="assets/addpm.js"></script>
+<script defer src="assets/stackdemo.js"></script>
 </head>
 <body>
 <div class="layout">
@@ -19,16 +21,17 @@
     <div class="brand"><a href="index.html">15-455 / project</a></div>
     <nav>
       <h4>Lecture 1</h4>
-      <a href="lecture1.html#s1-1">Setup</a>
-      <a href="lecture1.html#s1-2">Permutation branching programs</a>
-      <a href="lecture1.html#s1-3">Barrington's theorem</a>
-      <a href="lecture1.html#s1-4">Wrap-up</a>
+      <a href="lecture1.html#s1-1">Permutation branching programs</a>
+      <a href="lecture1.html#s1-2">Barrington's theorem</a>
+      <a href="lecture1.html#s1-3">Wrap-up</a>
+      <a href="lecture1.html#refs">References</a>
       <h4>Lecture 2</h4>
       <a href="#s2-1">Register programs</a>
       <a href="#s2-2">Catalytic space</a>
       <a href="#s2-3">Tree Evaluation</a>
       <a href="#s2-4">Cook–Mertz</a>
-      <a href="#s2-5">Payoff: Williams (2025)</a>
+      <a href="#s2-5">Wrap-up</a>
+      <a href="#refs">References</a>
     </nav>
   </aside>
 
@@ -36,82 +39,456 @@
     <div class="eyebrow">// lecture 02</div>
     <h1>Computing with a Full Memory</h1>
 
-    <div class="draft-banner">Draft. Dashed blocks are placeholders: replace each with your own text and remove its data-draft attribute.</div>
+    <p>Last lecture we showed how constant memory and reversibility can allow us to compute all of $\NC^1$.</p>
 
-    <!-- ================================================================ -->
+    <p>Let's begin with a new question: suppose you have extra memory full of someone else's data, and you must return it to them untouched ~ can this memory still help you?</p>
+
+    <p>This exact idea was used to put TreeEval, a candidate problem for separating $\L$ and $\P$, in close to logarithmic space. On top of that, this result was then used to prove the most recent time-to-space simulation bound by Williams, in 2025.</p>
+
+    <p>In this lecture, we will go over register programs, how they lead into catalytic space, the TreeEval problem, and finally, Cook–Mertz.</p>
+
+    <h3>Prerequisites</h3>
+
+    <ul>
+      <li>from <a href="lecture1.html">Lecture 1</a>: <a href="lecture1.html#def-sigma-computes">$\sigma$-computing</a>, the commutator construction of <a href="lecture1.html#lem-and">$\AND$</a>, and <a href="lecture1.html#thm-barrington">Barrington's theorem</a></li>
+    </ul>
+
+    <div class="definition" data-title="$\L$-uniform circuit family" id="def-luniform">
+      <p>A circuit family $\{C_n\}$ is $\L$-uniform if there is a TM $M$ (a circuit generator) that, given $1^n$, outputs $C_n$ using $O(\log n)$ space.</p>
+    </div>
+
+    <div class="definition" data-title="Threshold gate" id="def-threshold">
+      <p>A threshold gate with inputs $y_1, \dots, y_w \in \{0,1\}$ and integer weights $c_0, c_1, \dots, c_w$ outputs $1$ if $c_0 + c_1 y_1 + \cdots + c_w y_w \ge 0$, and $0$ otherwise. This is a linear threshold function from the course notes, with inputs in $\{0,1\}$ instead of $\{1,-1\}$.</p>
+    </div>
+
+    <div class="fact" data-title="$\Z_p$ is a field" id="fact-field">
+      <p>For prime $p$, $\Z_p$ with addition and multiplication mod $p$ is a field: every $a \neq 0$ has a multiplicative inverse.</p>
+    </div>
+
+    <div class="fact" data-title="Fermat's little theorem" id="fact-flt">
+      <p>For prime $p$ and $a \in \Z_p$, $a^{p-1} = 1$ if $a \neq 0$, and $a^{p-1} = 0$ if $a = 0$.</p>
+    </div>
+
+    <div class="fact" data-title="Primitive roots" id="fact-primroot">
+      <p>For prime $p$, there is some $\omega \in \Z_p$ of order $p - 1$, i.e. $\omega^{p-1} = 1$ and $\omega^e \neq 1$ for all $0 &lt; e &lt; p - 1$.</p>
+    </div>
+
     <h2 id="s2-1"><span class="secnum">2.1</span>Register programs</h2>
-    <!-- outline: Ben-Or–Cleve. Barrington over rings: three registers, and the commutator becomes
-         "do, do, undo, undo." Programs add f(x) into a register and restore every other register. -->
 
-    <div class="gram" data-draft></div>
+    <p>Register programs are essentially an arithmetic version of permutation branching programs that is easier to generalize. Instead of a fixed set of states, we get a few registers holding elements of some ring.</p>
 
-    <div class="definition" data-title="Register program" id="def-regprog" data-draft></div>
+    <div class="definition" data-title="Register program" id="def-regprog">
+      <ul>
+        <li>fix ring $R$</li>
+        <li>state: $\tau = (\tau_1, \dots, \tau_k) \in R^k$, $\tau_i$ value in $r_i$</li>
+        <li>instructions are of the form: $r_i \gets r_i \pm g(x, r_1, \dots, r_{i-1}, r_{i+1}, \dots, r_k)$</li>
+        <li>$g$ is in one of the following forms:
+          $$c, \quad x_a, \quad c \cdot r_j, \quad x_a \cdot r_j, \quad r_j \cdot r_{j'}$$</li>
+        <li>a register program is a product of instructions $P = I_1 I_2 I_3 \cdots I_t$ with length $t$. Given input $x$, it maps the initial state $\tau$ to $P_x(\tau)$ by applying each instruction left to right</li>
+      </ul>
+    </div>
 
-    <div class="definition" data-title="Cleanly computing $f$" id="def-clean" data-draft></div>
+    <p>The following definition is especially important. Given any starting state, clean computation always adds the same thing to one register, and leaves the others untouched.</p>
 
-    <div class="lemma" data-title="Do, do, undo, undo" id="lem-ddu" data-draft></div>
-    <div class="proof" data-draft></div>
+    <div class="definition" data-title="Cleanly computing" id="def-clean">
+      <p>Given $v : \{0,1\}^n \to R$, a program $P$ cleanly computes $v$ into $r_i$, written $P : r_i \pluseq v$, if $\forall x$ and $\forall \tau = (\tau_1, \dots, \tau_k)$,
+      $$P_x(\tau) = (\tau_1, \dots, \tau_{i-1}, \tau_i + v(x), \tau_{i+1}, \dots, \tau_k).$$</p>
+    </div>
 
-    <div class="theorem" data-title="Ben-Or–Cleve" id="thm-boc" data-draft></div>
-    <div class="proof" data-draft></div>
+    <div class="lemma" data-title="Inverses" id="lem-inv">
+      <p>Given a program $P = I_1 \cdots I_t$ of length $t$, there is a program $P^{-1}$ of length $t$ such that $\forall x$ and $\forall \tau$, $P^{-1}_x(P_x(\tau)) = \tau$.</p>
+    </div>
+    <div class="proof">
+      <p>First, note that an arbitrary instruction $I : r_i \gets r_i \pm g$ can be undone by $I' : r_i \gets r_i \mp g$. Since $I$ only changes $r_i$ and $g$ does not depend on $r_i$, $I'$ sees the same value of $g$ that $I$ added.</p>
+      <p>So let $P^{-1} = I'_t \cdots I'_1$, which undoes the instructions of $P$ in reverse order. Then $P^{-1}_x(P_x(\tau)) = \tau$ $\forall x, \tau$, and $P^{-1}$ has length $t$.</p>
+    </div>
 
-    <!-- ================================================================ -->
+    <div class="note" id="note-bij">
+      <p>If we had an instruction $r_i \gets r_i + g$ where $g$ could depend on $r_i$, instructions would not be guaranteed to be bijective over $R^k$ and we lose invertibility.</p>
+    </div>
+
+    <div class="note" id="note-rename">
+      <p>If we rename registers, a program targeting $r_i$ can target any other register. This is analogous to the role conjugation plays in Barrington's.</p>
+    </div>
+
+    <p>Naive multiplication does not work as intended in this model, since registers are assumed to have leftover junk. If we add $a$ into $r_1$ and $b$ into $r_2$, then $r_0 \pluseq r_1 r_2$ adds $(\tau_1 + a)(\tau_2 + b)$, including junk from the initial contents.</p>
+
+    <div class="lemma" data-title="Do, do, undo, undo" id="lem-ddu">
+      <p>Let $P_1 : r_1 \pluseq a$, $P_2 : r_2 \pluseq b$ be clean programs on the same registers $r_0, r_1, \dots, r_k$, where $k \ge 2$. The program below cleanly computes $r_0 \pluseq ab$:
+      $$P_1,\ \ r_0 \minuseq r_1 r_2,\ \ P_2,\ \ r_0 \pluseq r_1 r_2,\ \ P_1^{-1},\ \ r_0 \minuseq r_1 r_2,\ \ P_2^{-1},\ \ r_0 \pluseq r_1 r_2$$</p>
+    </div>
+    <div class="proof">
+      <p>Let $r_0, r_1, r_2$ start with contents $(\tau_0, \tau_1, \tau_2)$.</p>
+      <div class="scroll-x">
+      <table class="trace grid">
+        <tr><th></th><th>$r_0$</th><th>$r_1$</th><th>$r_2$</th><th>$r_3, \dots, r_k$</th></tr>
+        <tr><td>start</td><td>$\tau_0$</td><td>$\tau_1$</td><td>$\tau_2$</td><td>$\tau_3, \dots, \tau_k$</td></tr>
+        <tr><td>$P_1$</td><td>$\dots$</td><td>$\tau_1 + a$</td><td>$\dots$</td><td>$\dots$</td></tr>
+        <tr><td>$r_0 \minuseq r_1 r_2$</td><td>$\tau_0 - (\tau_1 + a)\tau_2$</td><td>$\dots$</td><td>$\dots$</td><td>$\dots$</td></tr>
+        <tr><td>$P_2$</td><td>$\dots$</td><td>$\dots$</td><td>$\tau_2 + b$</td><td>$\dots$</td></tr>
+        <tr><td>$r_0 \pluseq r_1 r_2$</td><td>$\tau_0 + (\tau_1 + a)b$</td><td>$\dots$</td><td>$\dots$</td><td>$\dots$</td></tr>
+        <tr><td>$P_1^{-1}$</td><td>$\dots$</td><td>$\tau_1$</td><td>$\dots$</td><td>$\dots$</td></tr>
+        <tr><td>$r_0 \minuseq r_1 r_2$</td><td>$\tau_0 + ab - \tau_1\tau_2$</td><td>$\dots$</td><td>$\dots$</td><td>$\dots$</td></tr>
+        <tr><td>$P_2^{-1}$</td><td>$\dots$</td><td>$\dots$</td><td>$\tau_2$</td><td>$\dots$</td></tr>
+        <tr><td>$r_0 \pluseq r_1 r_2$</td><td>$\tau_0 + ab$</td><td>$\dots$</td><td>$\dots$</td><td>$\dots$</td></tr>
+      </table>
+      </div>
+    </div>
+
+    <div class="note" id="note-comm">
+      <p>Observe how the order $P_1 P_2 P_1^{-1} P_2^{-1}$ is the same shape as the commutator $\sigma\tau\sigma^{-1}\tau^{-1}$ used to construct $\AND$ from <a href="lecture1.html#lem-and">last lecture</a>.</p>
+    </div>
+
+    <p>Given that registers work over arithmetic, particularly addition and multiplication, we can perform the same kind of induction done in <a href="lecture1.html#thm-barrington">Barrington's theorem</a>, but with arithmetic formulae. Notice how the length bound is similar in form.</p>
+
+    <div class="definition" data-title="Arithmetic formula over $\Z_p$" id="def-arith">
+      <p>An arithmetic formula over $\Z_p$, $F$, with input variables $(x_1, \dots, x_n) \in \{0,1\}^n$ and depth $d$ can be defined as a binary tree with height $d$ where</p>
+      <ul>
+        <li>leaf nodes are $c \in \Z_p$ or some input variable $x_i$</li>
+        <li>internal nodes have 2 children, $A$ and $B$, and have value $A \times B$ or $A + B$ over $\Z_p$</li>
+      </ul>
+      <p>An arithmetic formula is evaluated bottom up.</p>
+    </div>
+
+    <div class="theorem" data-title="Ben-Or–Cleve" id="thm-boc">
+      <p>Let $F$ be an arithmetic formula over $\Z_p$ with fan-in-2 $+$ and $\times$ gates and depth $d$. Then, for each target register, there is a clean program computing $F(x)$ into it with 3 registers and length at most $T(d)$, where $T(0) = 1$ and
+      $$T(d) = 4T(d-1) + 4 \in O(4^d).$$</p>
+    </div>
+    <div class="proof">
+      <p>Induct on $d$.</p>
+      <p><strong>Base case:</strong> depth 0, $F(x) = x_a$ for some $a$ or $F(x) = c$. In either case, consider the length 1 programs
+      $$P_F : r_i \pluseq x_a, \quad \text{or} \quad P_F : r_i \pluseq c.$$</p>
+      <p><strong>Inductive case:</strong> $G, H$ are of depth $d - 1$.</p>
+      <ul>
+        <li>$F(x) = G(x) + H(x)$: by IH, $\exists P_G : r_i \pluseq G(x)$ and $P_H : r_i \pluseq H(x)$, both targeting $r_i$, each of length $T(d-1)$. Consider $P_F = P_G P_H$ (run $P_G$, then $P_H$), which gives $r_i \pluseq G(x) + H(x)$ and has length $T(d-1) + T(d-1) = 2T(d-1)$</li>
+        <li>$F(x) = G(x) \cdot H(x)$: by <a class="ref" href="#lem-ddu"></a>, $\exists P_F$ of length $4T(d-1) + 4$</li>
+      </ul>
+    </div>
+
+    <p>We can apply this to something more useful, and more akin to the Barrington result.</p>
+
+    <div class="corollary" data-title="Boolean formulae" id="cor-bool">
+      <p>Every Boolean formula with fan-in-2 $\AND$/$\OR$ gates and unary $\NOT$ gates of depth $d$ can be cleanly computed over $\Z_2$ by a length $O(64^d)$ program with 3 registers.</p>
+    </div>
+    <div class="proof">
+      <p>We work over the ring $\Z_2$. We translate the Boolean formula to an arithmetic formula as follows:</p>
+      <ul>
+        <li>$\AND$ gates become $\times$ gates</li>
+        <li>$\NOT$ gates become $+$ gates, with the other input fixed to be $1$</li>
+        <li>$\OR(a, b)$ gates become $\NOT(\AND(\NOT(a), \NOT(b)))$</li>
+      </ul>
+      <p>The resulting arithmetic formula has depth at most $3d$. <a class="ref" href="#thm-boc"></a> then gives $T(3d) \in O(64^d)$.</p>
+    </div>
+
     <h2 id="s2-2"><span class="secnum">2.2</span>Catalytic space</h2>
-    <!-- outline: Model: O(log n) clean space, plus a full disk that must be returned exactly as found.
-         Warm-up: NC¹ ⊆ CL.
-         Stated: TC¹ ⊆ CL, so NL ⊆ CL. Directed reachability becomes solvable in log space with a borrowed disk. -->
 
-    <div class="gram" data-draft></div>
+    <p>Now we revisit the question of using someone else's memory. This is an interesting question. If you have to store all of the data you erase to make space for new work, you haven't gained anything. Maybe you could compress it? But this is not always possible, and our machine needs to work regardless of what is in the other person's memory.</p>
 
-    <div class="definition" data-title="Catalytic log-space $\CL$" id="def-cl" data-draft></div>
+    <p>Luckily, register programs are the right tool for this. They can cleanly compute results regardless of the starting contents, and restore them. Let's go over some details about catalytic space and how powerful it really is.</p>
 
-    <div class="proposition" data-title="$\NC^1 \subseteq \CL$" id="prop-nc1-cl" data-draft></div>
-    <div class="proof" data-draft></div>
+    <div class="definition" data-title="Catalytic TM" id="def-ctm">
+      <p>A catalytic TM with space $s$ and catalytic space $c$ has a read-only input, work tape of length $s$, and a catalytic tape of length $c$.</p>
+      <p>The catalytic tape starts with some arbitrary string $\tau \in \{0,1\}^c$. The TM must give the same answer (accept or reject) for all $\tau$, and upon halting, the catalytic tape must hold $\tau$.</p>
+    </div>
 
-    <div class="theorem" data-title="$\TC^1 \subseteq \CL$" id="thm-tc1-cl" data-draft></div>
+    <div class="definition" data-title="$\CSPACE$" id="def-cspace">
+      <p>$\CSPACE(s, c)$ is the class of languages decidable by a catalytic TM with space $s$ and catalytic space $c$.</p>
+    </div>
 
-    <div class="corollary" data-title="$\NL \subseteq \CL$" id="cor-nl-cl" data-draft></div>
+    <div class="definition" data-title="$\CL$" id="def-cl">
+      <p>$$\CL = \CSPACE(O(\log n), \poly(n))$$</p>
+    </div>
 
-    <!-- ================================================================ -->
+    <div class="note" id="note-trivial">
+      <p>Trivially we have $\L \subseteq \CL$, ignoring the catalytic space, and $\CL \subseteq \PSPACE$, since a $\PSPACE$ machine can store a catalytic tape of polynomial length, fill it with some arbitrary starting state, and simulate the catalytic machine.</p>
+    </div>
+
+    <p>Below is a good example of the method required to use registers to save space.</p>
+
+    <div class="proposition" data-title="$\NC^1 \subseteq \CL$" id="prop-nc1-cl">
+      <p>$\L$-uniform $\NC^1 \subseteq \CL$.</p>
+    </div>
+    <div class="idea" id="idea-nc1-cl">
+      <p>In order to compute a language solvable by some circuit family, we need to do two things:</p>
+      <ul>
+        <li>show that this circuit family can be computed by some register program of reasonable length, by converting each circuit to an arithmetic formula without increasing its depth by more than a constant factor</li>
+        <li>show that we can efficiently construct and run this register program using a catalytic TM</li>
+      </ul>
+    </div>
+    <div class="proof">
+      <p>Since $L$ is in $\L$-uniform $\NC^1$ (<a class="ref" href="#def-luniform"></a>), there exists a log-space TM $M$ that, given $1^n$, outputs a fan-in-2 circuit $C_n$ of depth $d = O(\log n)$ deciding $L$ on inputs of length $n$. $M$ can apply the translation from <a class="ref" href="#cor-bool"></a> gate by gate as it outputs $C_n$, so WLOG $C_n$ is an arithmetic circuit over $\Z_2$ with $+$ and $\times$ gates, and still $d = O(\log n)$. We can unfold $C_n$ into a formula and apply <a class="ref" href="#thm-boc"></a> to get $P : r_0 \pluseq f(x)$ using 3 registers, where $f$ is the indicator function of $L$.</p>
+      <div class="claim" id="claim-run">
+        <p>$P$ can be run in $O(\log n)$ work space. This is the classical argument that $\L$-uniform $\NC^1 \subseteq \L$ (Borodin 1977).</p>
+      </div>
+      <div class="proof" data-title="sketch">
+        <p>The idea is to recurse over the formula as we do in the proof of <a class="ref" href="#thm-boc"></a>, executing each instruction as it is generated. Each level of recursion must hold the target register, whether we are running the program or its inverse, and the current step of whatever gate we are computing. This requires $O(1)$ space per level. On top of this, we store the 'path' from the output gate. Gates are found by following the 'path' from the output gate, then rerunning the circuit generator TM $M$ on $1^n$ to get the gate's type and children. All together, this requires $O(d) = O(\log n)$ bits.</p>
+      </div>
+      <p>Store $r_0, r_1, r_2$ in the first 3 cells of the catalytic tape, and let $\tau_0, \tau_1, \tau_2$ be their initial contents. If we assume the claim, the catalytic TM computes $L$ as follows:</p>
+      <ul>
+        <li>copy $\tau_0$, the initial contents of $r_0$, to the work tape</li>
+        <li>run $P$ on these registers</li>
+        <li>copy $r_0$ to the work tape and compute $r_0 + \tau_0 \bmod 2$ to get $f(x)$</li>
+        <li>set $r_0 = \tau_0$, and output $f(x)$</li>
+      </ul>
+
+      <p><strong>Correctness:</strong></p>
+      <ul>
+        <li>$P$ cleanly computes $r_0 \pluseq f(x)$, so after running it, $r_0 = \tau_0 + f(x)$ and $r_1, r_2$ are unmodified</li>
+        <li>over $\Z_2$, $\tau_0 + \tau_0 = 0$, so $r_0 + \tau_0 = f(x)$</li>
+        <li>setting $r_0 = \tau_0$ restores the catalytic tape, and the output $f(x)$ does not depend on $\tau$</li>
+      </ul>
+
+      <p><strong>Complexity:</strong> running $P$ takes $O(\log n)$ space by <a class="ref" href="#claim-run"></a>, and the other steps store only $\tau_0$ and $f(x)$. Thus, the TM uses $O(\log n)$ space, and 3 bits of catalytic space.</p>
+    </div>
+
+    <p>The uniformity assumption makes this weaker, but it is necessary, as non-uniform $\NC^1$ contains undecidable languages while $\CL \subseteq \PSPACE$. You may have noticed that we didn't use the catalytic space very much at all. In fact, we could've abandoned it entirely, since we used constant space for our registers. Let's go over a language that is more interesting, and seems to require the catalytic space.</p>
+
+    <p>$\TC^1$ is a good choice, since it contains $\NL$, via $\NL \subseteq \AC^1 \subseteq \TC^1$ (standard; see Buhrman, Cleve, Koucký, Loff, Speelman 2014 (BCKLS), Figure 1). Since $\L$ vs. $\NL$ is an open problem, a $\CL$ machine solving $\NL$ might be a surprise.</p>
+
+    <div class="definition" data-title="$\TC^1$" id="def-tc1">
+      <p>$\TC^1$ is the class of languages that can be computed by a polynomial-size, $O(\log n)$-depth circuit family with unbounded-fan-in $\AND$, $\OR$, and $\MAJ$ gates, and unary $\NOT$ gates. A $\MAJ$ gate with $w$ inputs $y_1, \dots, y_w$ outputs $1$ if at least half of its inputs are $1$, i.e. it is the threshold gate (<a class="ref" href="#def-threshold"></a>) with $c_1 = \dots = c_w = 1$ and $c_0 = -\lceil w/2 \rceil$.</p>
+    </div>
+
+    <div class="theorem" data-title="$\TC^1 \subseteq \CL$" id="thm-tc1-cl">
+      <p>$\L$-uniform $\TC^1 \subseteq \CL$ (BCKLS, Theorem 17).</p>
+    </div>
+    <div class="idea" id="idea-tc1-cl">
+      <p>We do the same two things as we did for <a class="ref" href="#prop-nc1-cl"></a>:</p>
+      <ul>
+        <li>show that the circuit family can be computed by a register program of polynomial length. This is now the difficult part, since majority gates need unbounded fan-in sums and a nonlinear test, and a $\TC^1$ circuit is too large to unfold into a formula because of unbounded fan-in</li>
+        <li>show that we can efficiently construct and run this program using a catalytic TM. This is almost the same as before, except that the catalytic tape will hold polynomially many registers</li>
+      </ul>
+    </div>
+    <div class="proof" data-title="sketch">
+      <ul>
+        <li>work over $\Z_p$ for a prime $p$ larger than every fan-in but $\le \poly(n)$, so registers are $O(\log n)$ bits</li>
+        <li>every gate is a threshold test on the sum $S$ of its $w$ inputs, and we use Fermat's little theorem (FLT, <a class="ref" href="#fact-flt"></a>) to turn this into arithmetic</li>
+        <li>sums use the subtract, run, add-back strategy from <a class="ref" href="#lem-ddu"></a>, and computing a power in FLT uses a binomial-expansion trick to cancel the junk in registers (BCKLS, Lemma 10)</li>
+        <li>instead of computing gates individually, circuits are computed in layers to avoid a recursive branching factor of $w$</li>
+        <li>we run the catalytic TM similarly, but with polynomially many registers in the catalytic tape, and running $P^{-1}$ after reading the output</li>
+      </ul>
+    </div>
+
+    <div class="remark" id="rem-cl">
+      <ul>
+        <li>$\CL \subseteq \ZPP$ (BCKLS), so its ability is limited</li>
+        <li>whether $\CL \subseteq \P$ and whether $\L \neq \CL$ are open. Since $\NL \subseteq \CL$, if $\CL = \L$ then $\NL = \L$, and even $\TC^1 = \L$. So either $\CL$ is much more powerful than $\L$, or $\L$ is much more powerful than we think</li>
+      </ul>
+    </div>
+
     <h2 id="s2-3"><span class="secnum">2.3</span>Tree Evaluation</h2>
-    <!-- outline: The problem, the obvious O(h·ℓ) = O(log² n) depth-first algorithm,
-         and why it was an L vs. P candidate. -->
 
-    <div class="gram" data-draft></div>
+    <p>This problem was initially posed as a way to separate $\L$ from $\P$ (Cook, McKenzie, Wehr, Braverman, Santhanam 2009). It is in $\P$, so $\TreeEval \notin \L$ would imply $\L \neq \P$. The obvious algorithm uses $O(\log^2 n)$ space.</p>
 
-    <div class="definition" data-title="$\TreeEval$" id="def-treeeval" data-draft></div>
+    <p>The premise behind the problem is to evaluate a tree of functions, with values at the leaves. At first glance, this seems difficult, because you should have to store the value of one child at each level of recursion while you recurse and compute the value of the other.</p>
 
-    <div class="proposition" data-title="Depth-first evaluation" id="prop-dfs" data-draft></div>
-    <div class="proof" data-draft></div>
+    <div class="definition" data-title="$\TreeEval_{h,\ell}$" id="def-treeeval">
+      <p>$\TreeEval_{h,\ell}$ is a function problem defined as follows. The input is a <em>complete</em> binary tree of height $h$ such that:</p>
+      <ul>
+        <li>each node has a label $u \in \{0,1\}^{\le h}$, and internal nodes have children labeled $u0$ and $u1$</li>
+        <li>each leaf stores a value $v \in \{0,1\}^\ell$</li>
+        <li>each internal node stores a function $f : \{0,1\}^\ell \times \{0,1\}^\ell \to \{0,1\}^\ell$ given in the input as a truth table</li>
+      </ul>
+      <p>Given that values propagate upward, $v_u = f_u(v_{u0}, v_{u1})$, the goal is to output the root's value.</p>
+    </div>
 
-    <div class="guidingquestion" data-draft></div>
+    <div class="proposition" id="prop-size">
+      <p>For $\TreeEval_{h,\ell}$, $\log n \in \Theta(h + \ell)$.</p>
+    </div>
+    <div class="proof">
+      <p><strong>Upper bound:</strong></p>
+      <ul>
+        <li>possible functions: $(2^\ell)^{2^{2\ell}} = 2^{\ell 2^{2\ell}} \Rightarrow \ell 2^{2\ell}$ bits</li>
+        <li>nodes: $\le 2^{h+1}$</li>
+        <li>$n \le 2^{h+1} \ell 2^{2\ell}$</li>
+        <li>$\log n \le h + 1 + 2\ell + \log \ell \in O(h + \ell)$</li>
+      </ul>
+      <p><strong>Lower bound:</strong></p>
+      <ul>
+        <li>a nontrivial tree must store at least one function using $\ell 2^{2\ell}$ bits, so $\log n \ge 2\ell$</li>
+        <li>each node must store at least one bit, so $n \ge 2^h$, and $\log n \ge h$</li>
+        <li>$\log n \ge \max(2\ell, h) \ge \frac{2\ell + h}{2} \in \Omega(h + \ell)$</li>
+      </ul>
+    </div>
 
-    <!-- ================================================================ -->
+    <div class="proposition" data-title="Depth-first evaluation" id="prop-dfs">
+      <p>$\TreeEval$ is in $\SPACE(\log^2 n)$ and $\P$.</p>
+    </div>
+    <div class="proof">
+      <p>Consider the evaluation function below:</p>
+      <div class="pseudo">
+        <div>def $\mathrm{eval}(u)$:</div>
+        <div class="i1">if $u$ is a leaf: return $v_u$</div>
+        <div class="i1">left $=$ $\mathrm{eval}(u0)$</div>
+        <div class="i1">right $=$ $\mathrm{eval}(u1)$</div>
+        <div class="i1">return $f_u(\text{left}, \text{right})$</div>
+      </div>
+      <p>Starting at the root, there are $h$ levels of recursion. Each stores $\ell$ bits for the value and constant additional bits (since each $f_u$ is a lookup). So $\TreeEval_{h,\ell}$ uses $O(h\ell)$ space, or $O(\log^2 n)$, via $h, \ell \in \Theta(\log n)$ (the worst case from $\log n \in \Theta(h + \ell)$).</p>
+      <p>Evaluate the $2^{h+1} \le n$ nodes bottom up in $\poly(n)$ time.</p>
+    </div>
+
+    <div class="guidingquestion">
+      <p>The lingering question here is this: do we really need to store that child value at each level of recursion? Perhaps iteratively computing values over registers and reversing our computation could save us from this.</p>
+    </div>
+
     <h2 id="s2-4"><span class="secnum">2.4</span>Cook–Mertz</h2>
-    <!-- outline: Write each node's function as a low-degree polynomial mod p.
-         Recover a value from noisy register contents by interpolation.
-         The recursion stores only a loop counter per level, giving O(log n · log log n) space. -->
 
-    <div class="theorem" data-title="Cook–Mertz" id="thm-cm" data-draft></div>
+    <p>Let's attempt to do exactly that. Instead of storing $v_{u0}$ while computing $v_{u1}$, we will use three groups of $\ell$ registers called $X$, $Y$, and $Z$, that every level of recursion shares. Each recursive call acting on one group will treat the others as borrowed memory.</p>
 
-    <div class="gram" data-draft></div>
+    <div class="demo" data-demo="stack" id="stack-demo"></div>
 
-    <div class="lemma" data-title="Low-degree representation" id="lem-lowdeg" data-draft></div>
-    <div class="proof" data-draft></div>
+    <p>The immediate issue is that $f_u$ is an arbitrary function, not the addition and multiplication we require. To fix this we turn $f_u$ into $\ell$ low-degree polynomials, one per bit, and use a number theory trick to extract the value we want from all the junk.</p>
 
-    <div class="lemma" data-title="Recovery by interpolation" id="lem-interp" data-draft></div>
-    <div class="proof" data-draft></div>
+    <p>But why exactly can't we just compute $f_u$ as is? Suppose we've added the children's values into $X$ and $Y$, leaving
+    $$X = x + v_{u0}, \qquad Y = y + v_{u1},$$
+    where $x$ and $y$ are whatever contents the registers held beforehand. Our goal is to add $f_u(v_{u0}, v_{u1})$ into $Z$, but we can only evaluate $f_u(x + v_{u0}, y + v_{u1})$, and because $f_u$ is not linear, we cannot subtract away the noise. Note that we cannot simply subtract $x$ and $y$ from each register, since this would require us to store $x$ and $y$ at this recursive level while recursing further, defeating the whole point.</p>
 
-    <div class="proof" data-title="of Cook–Mertz" data-draft></div>
+    <div class="lemma" data-title="Low-degree representation" id="lem-lowdeg">
+      <p>Given field $K$ and $g : \{0,1\}^N \to \{0,1\}$, there exists a polynomial $\tilde g$ over $K$ with $\deg(\tilde g) \le N$ such that $\forall z \in \{0,1\}^N$, $\tilde g(z) = g(z)$. It is called the multilinear extension and defined as follows:
+      $$\tilde g(z) = \sum_{a \in \{0,1\}^N} g(a) \prod_{i=1}^{N} \big(a_i z_i + (1 - a_i)(1 - z_i)\big)$$</p>
+      <p>Given a truth table for $g$, $\tilde g$ can be evaluated at any point in $K^N$ using $O(N + \log|K|)$ space.</p>
+    </div>
+    <div class="proof">
+      <p>Given $z \in \{0,1\}^N$, the product evaluates to 1 if $a = z$ and 0 otherwise, so over the sum, $\tilde g(z) = g(z)$.</p>
+      <p>$\deg(\tilde g) \le N$ since each product contains $N$ linear factors.</p>
+      <p>Evaluate $\tilde g$ by iterating through all $a \in \{0,1\}^N$ using an $O(N)$ space counter, and maintain a running sum over $K$ using $O(\log|K|)$ space.</p>
+    </div>
 
-    <!-- ================================================================ -->
-    <h2 id="s2-5"><span class="secnum">2.5</span>Payoff: Williams (2025)</h2>
-    <!-- outline: Reduce time-t computation to Tree Evaluation, giving TIME[t] ⊆ SPACE[√(t log t)]. -->
+    <div class="lemma" data-title="Roots of unity based recovery" id="lem-roots">
+      <p>Given $g : K^N \to K$, a polynomial over $K$ in $N$ variables with $\deg(g) &lt; m$, and $\omega \in K$, a primitive $m$-th root of unity (such that $\omega^m = 1$ and $\forall\, 0 &lt; e &lt; m$, $\omega^e \neq 1$), we have that $\forall r, s \in K^N$,
+      $$\sum_{j=1}^{m} g(\omega^j r + s) = m\, g(s).$$</p>
+    </div>
+    <div class="proof">
+      <p>Define $Q(t) = g(z(t))$ where $z(t) = tr + s$ and $z_i(t) = r_i t + s_i$.</p>
+      <p>Then $Q(t) = \sum_{e=0}^{\deg(Q)} c_e t^e$, and $\deg(Q) &lt; m$ because each $z_i(t)$ has degree at most 1 in $t$, so $Q = g \circ z$ has degree at most $\deg(g) &lt; m$.</p>
+      <p>Now what we want is
+      $$\begin{aligned}
+        \sum_{j=1}^{m} Q(\omega^j) &= \sum_{j=1}^{m} \sum_{e=0}^{\deg(Q)} c_e \omega^{je} = \sum_{e=0}^{\deg(Q)} c_e \sum_{j=1}^{m} (\omega^e)^j \\
+        &= c_0 \cdot m + \sum_{e=1}^{\deg(Q)} c_e \sum_{j=1}^{m} (\omega^e)^j = c_0 \cdot m + \sum_{e=1}^{\deg(Q)} c_e \cdot \omega^e \cdot \frac{(\omega^e)^m - 1}{\omega^e - 1} \\
+        &= c_0 \cdot m = Q(0) \cdot m \qquad (\deg(Q) &lt; m \text{ and } \omega \text{ primitive, so } (\omega^e)^m = 1 \text{ and } \omega^e \neq 1\text{)} \\
+        &= g(z(0)) \cdot m = g(s) \cdot m
+      \end{aligned}$$</p>
+    </div>
 
-    <div class="theorem" data-title="Williams 2025" id="thm-williams" data-draft></div>
-    <div class="proof" data-title="sketch" data-draft></div>
+    <p>To summarize, <a class="ref" href="#lem-lowdeg"></a> provides us with $\tilde f_{u,i}$ with degree $\le 2\ell$, and <a class="ref" href="#lem-roots"></a> shows that averaging $\tilde f_{u,i}$ over the $m$ points $\omega^j r + s$, for well chosen $\omega$ and $m$, returns $\tilde f_{u,i}(s)$. In our case, $r$ is the junk, and $s$ holds the values of the children we care about.</p>
 
-    <footer><a href="lecture1.html">← Lecture 1</a> · work in progress</footer>
+
+    <div class="theorem" data-title="Cook–Mertz 2024" id="thm-cm">
+      <p>$\TreeEval_{h,\ell}$ is in $\SPACE(\log n \cdot \log\log n)$. More precisely, $\TreeEval_{h,\ell}$ is in $\SPACE((h + \ell)\log \ell)$.</p>
+    </div>
+
+    <div class="idea" data-title="Proof outline" id="idea-cm">
+      <p>In order to compute $\TreeEval_{h,\ell}$ space efficiently, we will define a recursive algorithm to add or subtract the value of a node into a target register group.</p>
+      <p>More specifically, we will iteratively compute the sum from <a class="ref" href="#lem-roots"></a> in order to get $\tilde f_{u,i}(v_{u0}, v_{u1})$ for each index $i$, where $\tilde f_{u,i}$ is the multilinear extension of $f_{u,i}$, the function computing the $i$th bit of $f_u$. In addition, we will undo our work on registers as we iterate.</p>
+    </div>
+
+    <div class="remark" data-title="Parameters" id="rem-params">
+      <p>In order to apply our two lemmas, we need a few things:</p>
+      <ul>
+        <li>$\omega \in K$ with order $m$ (for <a class="ref" href="#lem-roots"></a>)</li>
+        <li>$m &gt; \deg(\tilde f_{u,i})$, so $m &gt; 2\ell$ (for <a class="ref" href="#lem-roots"></a>)</li>
+        <li>$m \neq 0$ in $K$, so that we can divide by $m$ in step (4) of <a class="ref" href="#alg-add"></a></li>
+        <li>$K$ small, since every register stores an element of $K$</li>
+      </ul>
+      <p>To satisfy these requirements, we (handwaved)</p>
+      <ul>
+        <li>pick prime $p$ such that $2\ell + 2 &lt; p &lt; 4\ell + 4$ (this is guaranteed to exist by Bertrand's postulate)</li>
+        <li>set $K = \Z_p$, a field by <a class="ref" href="#fact-field"></a></li>
+        <li>set $m = p - 1$, so $m &gt; 2\ell$</li>
+        <li>find $\omega$, a primitive root mod $p$ with order $= m$ (this exists by <a class="ref" href="#fact-primroot"></a>, and can be found in $O(\log p)$ space)</li>
+      </ul>
+    </div>
+
+    <div class="algorithm" data-title="$\mathrm{Add}^\pm(u)$" id="alg-add">
+        <p>Define our memory to be groups of $\ell$ registers $\in \Z_p$, $X, Y, Z \in \Z_p^\ell$. WLOG, fix $Z$ to be our target group and $X, Y$ to be our scratch. The result of $\mathrm{Add}^+(u)$ should be $Z \gets Z + v_u$, and the result of $\mathrm{Add}^-(u)$ should be $Z \gets Z - v_u$.</p>
+        <div class="pseudo">
+          <div>$\mathrm{Add}^\pm(u)$:</div>
+          <div class="i1">if $u$ is a leaf: add $\pm v_u$ directly to $Z$</div>
+          <div class="i1">else:</div>
+          <div class="i2">for $j = 1 \dots m$:</div>
+          <div class="i3">multiply $X$ and $Y$ by $\omega^j$, coordinate-wise <span class="step">(1)</span></div>
+          <div class="i3">$\mathrm{Add}^+(u0)$ with target $X$ <span class="step">(2)</span></div>
+          <div class="i3">$\mathrm{Add}^+(u1)$ with target $Y$ <span class="step">(3)</span></div>
+          <div class="i3">for $i = 1 \dots \ell$: <span class="step">(4)</span></div>
+          <div class="i4">add $\pm \tilde f_{u,i}(X, Y) / m$ to $Z_i$</div>
+          <div class="i3">$\mathrm{Add}^-(u0)$ with target $X$ <span class="step">(5)</span></div>
+          <div class="i3">$\mathrm{Add}^-(u1)$ with target $Y$ <span class="step">(6)</span></div>
+          <div class="i3">multiply $X$ and $Y$ by $\omega^{-j}$, coordinate-wise <span class="step">(7)</span></div>
+        </div>
+        <p>To compute $\TreeEval_{h,\ell}$, set $X = Y = Z = 0$, run $\mathrm{Add}^+(\text{root})$ with target $Z$, and output $Z$.</p>
+    </div>
+
+    <div class="demo" data-demo="addpm" id="addpm-demo"></div>
+
+    <div class="proof" data-title="of Cook–Mertz">
+      <p><strong>Correctness:</strong></p>
+      <p>We induct on height, $h'$.</p>
+      <div class="claim" id="claim-add">
+        <p>For every node $u$ at height $h'$, either sign $\pm$, and starting state of each group of registers $X$, $Y$, and $Z$:</p>
+        <p>$\mathrm{Add}^\pm(u)$ adds $\pm v_u$ to the target group, and leaves the other two groups unchanged.</p>
+      </div>
+      <p><strong>Base case:</strong> $h' = 0$ ($u$ is a leaf)</p>
+      <p>$\mathrm{Add}^\pm(u)$ directly modifies the target register, and does nothing else.</p>
+      <p><strong>Inductive case:</strong> $h' \ge 1$ ($u$ is some internal node)</p>
+      <p>WLOG $Z$ is the target group. Label the initial contents of $X, Y, Z$ as $x, y, z$. Let $z'$ be the contents of $Z$ after some number of loop iterations. Across iterations, the following changes occur:</p>
+      <div class="scroll-x">
+      <table class="trace grid">
+        <tr><th></th><th>$X$</th><th>$Y$</th><th>$Z$</th></tr>
+        <tr><td>(1)</td><td>$\omega^j x$</td><td>$\omega^j y$</td><td>$\dots$</td></tr>
+        <tr><td>(2)</td><td>$\omega^j x + v_{u0}$</td><td>$\dots$</td><td>$\dots$</td></tr>
+        <tr><td>(3)</td><td>$\dots$</td><td>$\omega^j y + v_{u1}$</td><td>$\dots$</td></tr>
+        <tr><td>(4)</td><td>$\dots$</td><td>$\dots$</td><td>$\forall i \in [\ell],\ z'_i \pm \tilde f_{u,i}(X, Y)/m$</td></tr>
+        <tr><td>(5)</td><td>$\omega^j x$</td><td>$\dots$</td><td>$\dots$</td></tr>
+        <tr><td>(6)</td><td>$\dots$</td><td>$\omega^j y$</td><td>$\dots$</td></tr>
+        <tr><td>(7)</td><td>$x$</td><td>$y$</td><td>$\dots$</td></tr>
+      </table>
+      </div>
+      <p>At steps 2, 3, 5 and 6, we cite the IH for calls of $\mathrm{Add}^\pm$ to child nodes at height $h' - 1$.</p>
+      <p>Observe that non-targets $X$ and $Y$ are unchanged.</p>
+      <p>$Z$ is changed only at step 4, where $\forall i \in [\ell]$, $z'_i$ becomes $z'_i \pm \tilde f_{u,i}(\omega^j x + v_{u0}, \omega^j y + v_{u1})/m$. So after all $m$ iterations, if we write $r = (x, y)$ and $s = (v_{u0}, v_{u1})$,
+      $$\begin{aligned}
+        Z_i &= z_i \pm \frac{1}{m} \cdot \sum_{j=1}^{m} \tilde f_{u,i}(\omega^j r + s) \\
+        &= z_i \pm \tilde f_{u,i}(s) && \text{(Lemma: roots of unity based recovery)} \\
+        &= z_i \pm (v_u)_i && \text{(Lemma: low-degree representation)}
+      \end{aligned}$$</p>
+      <p>In particular, running $\mathrm{Add}^+(\text{root})$ with $X = Y = Z = 0$, as in <a class="ref" href="#alg-add"></a>, leaves $Z = v_{\text{root}}$, the output of $\TreeEval_{h,\ell}$.</p>
+
+      <p><strong>Complexity:</strong></p>
+      <p>Let's keep track of what we need to store as $\mathrm{Add}^\pm$ is recursively evaluated.</p>
+      <p>Across recursive levels we store:</p>
+      <ul>
+        <li>groups $X, Y, Z$: $3\ell \cdot \log p = O(\ell \log \ell)$</li>
+        <li>the current node: $h = O(h)$</li>
+        <li>scratch to evaluate $\tilde f_{u,i}$: $O(\ell + \log \ell) = O(\ell)$ (<a class="ref" href="#lem-lowdeg"></a>)</li>
+      </ul>
+      <p>And on the recursive stack we must store:</p>
+      <ul>
+        <li>the loop index $j$: $\log m = O(\log \ell)$</li>
+        <li>the loop step, target group, and sign: $O(1)$</li>
+      </ul>
+      <p>Across $h$ levels of recursion, this adds up to:
+      $$O(\ell \log \ell) + O(h) + O(\ell) + O(h \log \ell) + O(h) = O((h + \ell)\log \ell)$$</p>
+      <p>$h + \ell \in O(\log n)$ (<a class="ref" href="#prop-size"></a>), and $\log \ell \le \log\log n$, so this is $O(\log n \cdot \log\log n)$.</p>
+    </div>
+
+    <p>Let's think about what this result means. It shows that $\TreeEval$ is almost in $\L$, so one of the paths to showing $\L \neq \P$ is much weaker. I find it fascinating how such a unique perspective can provide such a fundamental insight into a key complexity theory question like $\L$ vs. $\P$.</p>
+
+    <h2 id="s2-5"><span class="secnum">2.5</span>Wrap-up</h2>
+
+    <p>Across both lectures, reversibility and algebraic cancellation allowed us to show some very important results. The commutator, do-do-undo-undo, and the roots of unity based averaging all used the same structure to allow us to recover the important part of a computation, and work with less memory than initially expected.</p>
+
+    <h2 id="refs">References</h2>
+    <ol class="refs">
+      <li>Michael Ben-Or and Richard Cleve. Computing algebraic formulas using a constant number of registers. <em>SIAM J. Comput.</em> 21(1), 1992. (STOC 1988)</li>
+      <li>Allan Borodin. On relating time and space to size and depth. <em>SIAM J. Comput.</em> 6(4), 1977.</li>
+      <li>Harry Buhrman, Richard Cleve, Michal Koucký, Bruno Loff, and Florian Speelman. Computing with a full memory: catalytic space. STOC 2014.</li>
+      <li>Stephen Cook, Pierre McKenzie, Dustin Wehr, Mark Braverman, and Rahul Santhanam. Pebbles and branching programs for tree evaluation. <em>ACM Trans. Comput. Theory</em> 3(2), 2012. (MFCS 2009)</li>
+      <li>James Cook and Ian Mertz. Tree evaluation is in space $O(\log n \cdot \log\log n)$. STOC 2024.</li>
+      <li>Oded Goldreich. On the Cook–Mertz tree evaluation procedure. ECCC, 2024.</li>
+      <li>Ryan Williams. Simulating time with square-root space. STOC 2025.</li>
+    </ol>
+
+    <footer><a href="lecture1.html">← Lecture 1</a></footer>
   </main>
 </div>
 </body>

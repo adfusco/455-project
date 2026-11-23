@@ -10,7 +10,6 @@
   --box-rule: #999999;
   --shade: #f2f2f2;
   --qed: #c8c8c8;
-  --draft: #b45309;
   --serif: Palatino, "Palatino Linotype", "Book Antiqua", "URW Palladio L", Georgia, serif;
   --sans: "IBM Plex Sans", system-ui, sans-serif;
   --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
@@ -97,16 +96,24 @@ details.env > .env-body { margin-top: 8px; }
 
 .exercise .env-head { margin-bottom: 4px; }
 
-/* ---------- drafts: placeholder blocks the author fills in ---------- */
-[data-draft] { outline: 1.5px dashed var(--draft); outline-offset: 4px; }
-[data-draft] .env-body:empty::before,
-.gram[data-draft]:empty::before {
-  content: "✎ draft — write this block"; font-family: var(--mono); font-size: 12.5px; color: var(--draft);
-}
-.draft-banner {
-  font-family: var(--mono); font-size: 12.5px; color: var(--draft);
-  border: 1px dashed var(--draft); border-radius: 6px; padding: 8px 12px; margin: 0 0 32px;
-}
+/* lists inside note blocks */
+.notes .env-body ul { margin: 0 0 14px; padding-left: 1.3em; }
+.notes .env-body li { margin: 2px 0; }
+
+/* register-trace tables (e.g. do, do, undo, undo) */
+.notes table.trace { border-collapse: collapse; margin: 6px 0 14px; }
+.notes table.trace td, .notes table.trace th { padding: 3px 14px 3px 0; text-align: left; vertical-align: top; white-space: nowrap; }
+.notes table.trace.grid td, .notes table.trace.grid th { border: 0.5px solid var(--box-rule); padding: 4px 12px; }
+.notes table.trace.grid th { font-weight: 400; background: var(--panel); }
+
+/* pseudocode: one line per div, indented with .i1–.i4 */
+.notes .pseudo { border-left: 2px solid var(--line); padding: 4px 0 4px 14px; margin: 8px 0 14px; }
+.notes .pseudo > div { line-height: 1.75; }
+.notes .pseudo .i1 { padding-left: 1.5em; }
+.notes .pseudo .i2 { padding-left: 3em; }
+.notes .pseudo .i3 { padding-left: 4.5em; }
+.notes .pseudo .i4 { padding-left: 6em; }
+.notes .pseudo .step { float: right; font-family: var(--mono); font-size: 13px; color: var(--muted); }
 
 /* ---------- figures + demos ---------- */
 figure { margin: 26px 0; }
@@ -141,3 +148,11 @@ figcaption { font-family: var(--sans); font-size: 13px; color: var(--muted); mar
 .demo th, .demo td { border: 1px solid var(--line); padding: 4px 10px; text-align: center; background: #fff; }
 .demo th { color: var(--muted); font-weight: 500; }
 .wiring svg { display: block; }
+
+/* ---------- hover previews for cross-references ---------- */
+.ref-preview {
+  position: absolute; z-index: 50; width: min(560px, calc(100vw - 16px)); max-height: 45vh; overflow: auto;
+  background: var(--bg); border: 1px solid var(--line); border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, .12); padding: 12px 16px; font-size: 15px;
+}
+.ref-preview > .env { margin: 0; }
